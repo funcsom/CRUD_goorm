@@ -3,10 +3,9 @@ import { useState } from "react";
 const TodoInput = ({ createTodo }) => {
   const [input, setInput] = useState("");
 
-  // const onChangeInput = (e) => {
-  //   console.log(e.target.value);
-  //   setInput(e.target.value);
-  // };
+  const onChangeInput = (e) => {
+    setInput(e.target.value);
+  };
 
   const onClickButton = () => {
     if (input.trim()) {
@@ -17,19 +16,17 @@ const TodoInput = ({ createTodo }) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") onClickButton();
-    // Enter를 누르면 할 일 추가
+    if (e.keyCode === 229) return;
+    // 이 코드 꼭 기억하자.
+    if (e.key === "Enter") {
+      onClickButton();
+      // console.log(e);
+    }
   };
 
   return (
     <div>
-      <input
-        value={input}
-        onChange={(e) => {
-          setInput(e.target.value);
-        }}
-        onKeyDown={handleKeyDown}
-      />
+      <input value={input} onChange={onChangeInput} onKeyDown={handleKeyDown} />
       <button onClick={onClickButton}>추가하기</button>
     </div>
   );

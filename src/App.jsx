@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import TodoNavigation from "./components/TodoNavigation";
 import TodoInput from "./components/TodoInput";
-import TodoOutput from "./components/TodoOutput";
+import TodoList from "./components/TodoList";
 import "./css/App.css";
 
 function App() {
@@ -10,25 +11,43 @@ function App() {
     return storedTodos ? JSON.parse(storedTodos) : [];
     // 로컬 스토리지에 데이터가 있으면 파싱으로 가져오고, 없으면 빈 배열로 초기화
     // 반환되는 내용이 todos가 됨
-
-    // JSON은 객체 구조로 되어있는 문자열 => 파싱이란, 문자열을 객체로 변환하는 것
-    // 객체를 문자열로 저장하는것은 stringify임
-    // parsing, stringify를 이용하면 로컬 스토리지에 접근할 수 있는 것
-    // 로컬 스토리지는 브라우저 캐시를 비우지 않는 이상 없어지지 않음 (일반적인것은 브라우저 끄거나 새로고침 하면 날라감)
-    // 로컬 스토리지는 추후 DB와 연결됨
   });
+
+  const [filteredTodos, setfilteredTodos] = useState([]);
+  const [filter, setFilter] = useState("All");
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
-  // useEffect를 통해 localStorage에 등록함.
+
+    // 여기 조금 더 생각하기
+    if (filter === "All") {
+      setfilteredTodos(todos);
+    } else if (filter === true) {
+      setfilteredTodos(todos.filter((todo) => todo.completed === true));
+    } else if (filter === false) {
+      setfilteredTodos(todos.filter((todo) => todo.completed === false));
+    }
+  }, [filter, todos]);
+  // useEffect를 통해 localStorage에 비동기 등록함
 
   const createTodo = (content) => {
     setTodos([...todos, { id: Date.now(), content, completed: false }]); // id값을 timestamp로 쓰는것이 자명함
   };
 
-  const updateTodo = (id) => {
-    setTodos(todos.map((item) => (item.id === id ? console.log(item) : item)));
+  const checkTodo = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const editTodo = (id, content) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, content: content } : todo
+      )
+    );
   };
 
   const deleteTodo = (id) => {
@@ -36,18 +55,17 @@ function App() {
   };
 
   return (
-    <>
-      {/* <button
-        onClick={() => {
-          updateTodo(1733206106759);
-        }}
-      >
-        업데이트한다
-      </button> */}
-      <h1>오늘은 C만 한다</h1>
+    <div>
+      <h1>한게 없는 성소민 정신차리자</h1>
+      <TodoNavigation setFilter={setFilter} />
       <TodoInput createTodo={createTodo} />
-      <TodoOutput todos={todos} updateTodo={updateTodo} />
-    </>
+      <TodoList
+        todos={filteredTodos}
+        checkTodo={checkTodo}
+        editTodo={editTodo}
+        deleteTodo={deleteTodo}
+      />
+    </div>
   );
 }
 
